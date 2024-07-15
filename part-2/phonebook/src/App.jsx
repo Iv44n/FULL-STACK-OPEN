@@ -6,6 +6,17 @@ const App = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const isIncluded = persons.find(
+      (person) => newName.toUpperCase() === person.name.toUpperCase()
+    );
+
+    if (isIncluded) {
+      alert(`${newName} is already added to phonebook`);
+      setNewName("");
+      return;
+    }
+
     setPersons([{ name: newName }, ...persons]);
     setNewName("");
   };
