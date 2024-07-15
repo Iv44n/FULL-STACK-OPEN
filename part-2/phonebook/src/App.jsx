@@ -1,28 +1,49 @@
 import { useState } from "react";
 
 const App = () => {
-  const [persons, setPersons] = useState([{ name: "Arto Hellas" }]);
-  const [newName, setNewName] = useState("");
+  const [persons, setPersons] = useState([
+    { name: "Arto Hellas", number: "+51-921-853-713" },
+  ]);
+  const [newPerson, setNewPerson] = useState({
+    name: "",
+    number: "",
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const isIncluded = persons.find(
-      (person) => newName.toUpperCase() === person.name.toUpperCase()
+      (person) => newPerson.name.toUpperCase() === person.name.toUpperCase()
     );
 
     if (isIncluded) {
-      alert(`${newName} is already added to phonebook`);
-      setNewName("");
+      alert(`${newPerson.name} is already added to phonebook`);
+      setNewPerson({
+        name: "",
+        number: "",
+      });
       return;
     }
 
-    setPersons([{ name: newName }, ...persons]);
-    setNewName("");
+    setPersons([newPerson, ...persons]);
+    setNewPerson({
+      name: "",
+      number: "",
+    });
   };
 
-  const handleChange = (e) => {
-    setNewName(e.target.value);
+  const handleChangeName = (e) => {
+    setNewPerson({
+      ...newPerson,
+      name: e.target.value,
+    });
+  };
+
+  const handleChangeNumber = (e) => {
+    setNewPerson({
+      ...newPerson,
+      number: e.target.value,
+    });
   };
 
   return (
@@ -30,7 +51,10 @@ const App = () => {
       <h2>Phonebook</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          name: <input value={newName} onChange={handleChange} />
+          name: <input onChange={handleChangeName} value={newPerson.name} />
+        </div>
+        <div>
+          number: <input onChange={handleChangeNumber} value={newPerson.number} />
         </div>
         <div>
           <button type="submit">add</button>
@@ -38,8 +62,10 @@ const App = () => {
       </form>
       <h2>Numbers</h2>
       <ul>
-        {persons.map(({ name }) => (
-          <li key={name}>{name}</li>
+        {persons.map((person) => (
+          <li key={person.name}>
+            {person.name} {person.number}
+          </li>
         ))}
       </ul>
     </div>
