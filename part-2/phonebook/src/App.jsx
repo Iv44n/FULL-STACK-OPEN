@@ -49,6 +49,12 @@ const App = () => {
     setTextFilter(value)
   }
 
+  const deletePerson = (personDelete) => {
+    if (window.confirm(`Delete ${personDelete.name}?`)) {
+      personService.deletePerson(personDelete.id).then(data => setPersons(persons.filter(person => person.id !== data.id)))
+    }
+  }
+
   return (
     <>
       <h1>Phonebook</h1>
@@ -61,7 +67,11 @@ const App = () => {
         newPerson={newPerson}
       />
       <h2>Numbers</h2>
-      <Persons persons={persons} textFilter={textFilter} />
+      <Persons
+        persons={persons}
+        textFilter={textFilter}
+        deletePerson={deletePerson}
+      />
     </>
   );
 };
