@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
@@ -17,17 +16,37 @@ const App = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (persons.some((person) => newPerson.name.toUpperCase() === person.name.toUpperCase())) {
-      alert(`${newPerson.name} is already added to phonebook`);
-      setNewPerson({
-        name: "",
-        number: "",
-      });
-      return;
-    }
+    const existingPerson = persons.find(
+      (person) => newPerson.name.toUpperCase() === person.name.toUpperCase()
+    );
 
-    personService.addPerson(newPerson).then(data => setPersons([...persons, data]))
-    setNewPerson({ name: "", number: "" })
+    if (existingPerson) {
+      const confirmUpdate = window.confirm(
+        `${existingPerson.name} is already added to phonebook, replace the old number with a new one?`
+      );
+
+      setNewPerson({ name: "", number: "" });
+      if (confirmUpdate) {
+        const updatePerson = {
+          ...existingPerson,
+          number: newPerson.number,
+        };
+
+        personService
+          .updatePerson(existingPerson.id, updatePerson)
+          .then((data) => {
+            setPersons(
+              persons.map((person) => (person.id === data.id ? data : person))
+            );
+          });
+        return;
+      }
+    } else {
+      personService
+        .addPerson(newPerson)
+        .then((data) => setPersons([...persons, data]));
+      setNewPerson({ name: "", number: "" });
+    }
   };
 
   const handleChangeName = (e) => {
