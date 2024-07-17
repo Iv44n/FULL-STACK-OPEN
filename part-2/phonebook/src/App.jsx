@@ -3,8 +3,7 @@ import axios from "axios";
 import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
-
-const BASE_URL = "http://localhost:3001/persons"
+import personService from './services/person'
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -12,9 +11,7 @@ const App = () => {
   const [textFilter, setTextFilter] = useState("");
 
   useEffect(() => {
-    axios.get(BASE_URL).then((res) => {
-      setPersons(res.data);
-    });
+    personService.getAll().then(data => setPersons(data))
   }, []);
 
   const handleSubmit = (e) => {
@@ -29,10 +26,8 @@ const App = () => {
       return;
     }
 
-    axios.post(BASE_URL, newPerson).then(res => {
-      setPersons([...persons, res.data])
-      setNewPerson({ name: "", number: "", });
-    })
+    personService.addPerson(newPerson).then(data => setPersons([...persons, data]))
+    setNewPerson({ name: "", number: "" })
   };
 
   const handleChangeName = (e) => {
