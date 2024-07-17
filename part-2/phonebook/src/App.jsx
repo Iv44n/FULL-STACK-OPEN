@@ -4,13 +4,15 @@ import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
 
+const BASE_URL = "http://localhost:3001/persons"
+
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newPerson, setNewPerson] = useState({ name: "", number: "" });
   const [textFilter, setTextFilter] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((res) => {
+    axios.get(BASE_URL).then((res) => {
       setPersons(res.data);
     });
   }, []);
@@ -27,13 +29,10 @@ const App = () => {
       return;
     }
 
-    const newPersonObject = {
-      ...newPerson,
-      id: persons.length + 1
-    }
-
-    setPersons([newPersonObject, ...persons]);
-    setNewPerson({ name: "", number: "", });
+    axios.post(BASE_URL, newPerson).then(res => {
+      setPersons([...persons, res.data])
+      setNewPerson({ name: "", number: "", });
+    })
   };
 
   const handleChangeName = (e) => {
