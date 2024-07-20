@@ -45,6 +45,12 @@ const App = () => {
               message: `${data.name}'s number has been changed`,
               type: 'success'
             })
+          }).catch(() => {
+            setNotification({
+              message: `Failed to update person ${updatePerson.name}`,
+              type: 'error'
+            });
+          }).finally(() => {
             setTimeout(() => setNotification(null), 5000)
           });
         return;
@@ -58,6 +64,12 @@ const App = () => {
             message: `Added ${data.name}`,
             type: 'success'
           })
+        }).catch(() => {
+          setNotification({
+            message: `Failed to add person ${newPerson.name}`,
+            type: 'error'
+          })
+        }).finally(() => {
           setTimeout(() => setNotification(null), 5000)
         });
       setNewPerson({ name: "", number: "" });
@@ -85,7 +97,20 @@ const App = () => {
 
   const deletePerson = (personDelete) => {
     if (window.confirm(`Delete ${personDelete.name}?`)) {
-      personService.deletePerson(personDelete.id).then(data => setPersons(persons.filter(person => person.id !== data.id)))
+      personService.deletePerson(personDelete.id).then(data => {
+        setPersons(persons.filter(person => person.id !== data.id))
+        setNotification({
+          message: `${data.name} has been removed from the server`,
+          type: 'success'
+        })
+      }).catch(() => {
+        setNotification({
+          message: `Information of ${personDelete.name} has already been removed from server`,
+          type: 'error'
+        })
+      }).finally(() => {
+        setTimeout(() => setNotification(null), 5000)
+      })
     }
   }
 
