@@ -16,6 +16,10 @@ function App() {
     setSearchText(e.target.value);
   };
 
+  const countriesFiltered = countries.filter((countrie) =>
+    countrie.name.common.toUpperCase().includes(searchText.toUpperCase())
+  );
+
   return (
     <>
       <form>  
@@ -24,7 +28,7 @@ function App() {
           <input type="text" onChange={handleChange} value={searchText} />
         </span>
       </form>
-      <Countries countries={countries} textFilter={searchText}/>
+      <Countries countries={searchText.length > 0 && countriesFiltered || []}/>
     </>
   );
 }

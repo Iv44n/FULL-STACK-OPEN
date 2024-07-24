@@ -1,42 +1,18 @@
-import { useEffect, useState } from "react";
 import Country from "./Country";
+import ListItem from "./ListItem";
 
-const Countries = ({ countries, textFilter }) => {
-  const [dataCountries, setDataCountries] = useState(countries);
-
-  useEffect(() => {
-    if (textFilter.length > 0) {
-      const countriesFiltered = countries.filter((countrie) =>
-        countrie.name.common.toUpperCase().includes(textFilter.toUpperCase())
-      );
-
-      setDataCountries(countriesFiltered);
-    } else {
-      setDataCountries(countries);
-    }
-  }, [textFilter, countries]);
-
-  if (dataCountries.length > 10 && textFilter.length > 0) {
+const Countries = ({ countries }) => {
+  if (countries.length > 10)
     return <p>Too many matches, specify another filter</p>;
-  } else if (dataCountries.length <= 10 && dataCountries.length > 1) {
+  else if (countries.length === 1) return <Country country={countries[0]} />;
+  else
     return (
       <ul>
-        {dataCountries.map((countrie) => (
-          <li key={countrie.name.common}>{countrie.name.common}</li>
+        {countries.map((countrie) => (
+          <ListItem key={countrie.name.common} country={countrie} />
         ))}
       </ul>
     );
-  } else if (dataCountries.length === 1) {
-    return <Country country={dataCountries[0]} />;
-  }
-
-  return (
-    <ul>
-      {dataCountries.map((countrie) => (
-        <li key={countrie.name.common}>{countrie.name.common}</li>
-      ))}
-    </ul>
-  );
 };
 
 export default Countries;
