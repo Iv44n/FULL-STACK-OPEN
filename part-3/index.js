@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 
+app.use(express.json())
+
 let data = [
   {
     id: 1,
@@ -23,6 +25,13 @@ let data = [
     number: "39-23-6423122",
   },
 ];
+
+const generateUniqueId = () => {
+  const randomSuffix = Math.floor(Math.random() * 100) + 1234;
+  const timestamp = Date.now().toString().slice(-8)
+  const id = parseInt(timestamp) + randomSuffix;
+  return id
+}
 
 app.get("/info", (req, res) => {
   const date = new Date();
@@ -49,6 +58,17 @@ app.delete("/api/persons/:id", (req, res) => {
 
   res.status(204).end();
 });
+
+app.post('/api/persons', (req, res) => {
+  const body = req.body
+  const newPerson = {
+    id: generateUniqueId(),
+    ...body
+  }
+
+  data = [newPerson, ...data]
+  res.json(newPerson)
+})
 
 const PORT = 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
