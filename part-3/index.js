@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require("express");
 const morgan = require('morgan')
 const cors = require('cors')
+const Person = require('./models/person');
 
 const app = express();
 
@@ -12,53 +14,28 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :d
 app.use(express.static('dist'))
 
 
-let data = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
-
-const generateUniqueId = () => {
-  const randomSuffix = Math.floor(Math.random() * 100) + 1234;
-  const timestamp = Date.now().toString().slice(-8)
-  const id = parseInt(timestamp) + randomSuffix;
-  return id
-}
-
 app.get("/info", (req, res) => {
   const date = new Date();
-  res.send(`
-    <p>Phonebook has info for ${data.length} persons</p>
-    <p>${date}</p>
-  `);
+  Person.find({}).then((data) => {
+    res.send(`
+      <p>Phonebook has info for ${data.length} persons</p>
+      <p>${date}</p>
+    `);
+  });
 });
 
 app.get("/api/persons", (req, res) => {
-  res.json(data);
+  Person.find({}).then((data) => {
+    res.json(data);
+  });
 });
 
 app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const person = data.find((info) => info.id === id);
+  const id = req.params.id;
 
-  person ? res.json(person) : res.status(404).end();
+  Person.findById(id).then((data) => {
+    res.json(data);
+  });
 });
 
 app.delete("/api/persons/:id", (req, res) => {
@@ -87,5 +64,5 @@ app.post('/api/persons', (req, res) => {
   res.json(newPerson)
 })
 
-const PORT = 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
