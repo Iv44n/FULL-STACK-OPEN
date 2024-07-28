@@ -47,21 +47,22 @@ app.delete("/api/persons/:id", (req, res) => {
 
 app.post('/api/persons', (req, res) => {
   const body = req.body
-  const personExists = data.find(info => body.name?.toUpperCase() === info.name?.toUpperCase())
 
-  if (personExists || !body.name || !body.number) {
+  if (!body.name || !body.number) {
     return res.status(400).json({
-      error: 'name must be unique or name or number missing'
+      error: 'name or number missing'
     })
   }
 
-  const newPerson = {
-    id: generateUniqueId(),
-    ...body
-  }
+  const person = new Person({
+    name: body.name,
+    number: body.number
+  })
 
-  data = [...data, newPerson]
-  res.json(newPerson)
+  person.save().then(personSaved => {
+    res.json(personSaved)
+  })
+
 })
 
 const PORT = process.env.PORT;
