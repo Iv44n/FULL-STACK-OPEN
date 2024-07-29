@@ -95,17 +95,17 @@ const App = () => {
     setTextFilter(value)
   }
 
-  const deletePerson = (personDelete) => {
-    if (window.confirm(`Delete ${personDelete.name}?`)) {
-      personService.deletePerson(personDelete.id).then(data => {
-        setPersons(persons.filter(person => person.id !== data.id))
+  const deletePerson = ({ name, id }) => {
+    if (window.confirm(`Delete ${name}?`)) {
+      personService.deletePerson(id).then(() => {
+        setPersons(persons.filter(person => person.id !== id))
         setNotification({
-          message: `${data.name} has been removed from the server`,
+          message: `${name} has been removed from the server`,
           type: 'success'
         })
       }).catch(() => {
         setNotification({
-          message: `Information of ${personDelete.name} has already been removed from server`,
+          message: `Information of ${name} has already been removed from server`,
           type: 'error'
         })
       }).finally(() => {

@@ -39,20 +39,15 @@ app.get("/api/persons/:id", (req, res) => {
 });
 
 app.delete("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  data = data.filter((info) => info.id !== id);
+  const id = req.params.id;
 
-  res.status(204).end();
+  Person.findByIdAndDelete(id).then(() => {
+    res.status(204).end()
+  });
 });
 
 app.post('/api/persons', (req, res) => {
   const body = req.body
-
-  if (!body.name || !body.number) {
-    return res.status(400).json({
-      error: 'name or number missing'
-    })
-  }
 
   const person = new Person({
     name: body.name,
@@ -62,7 +57,7 @@ app.post('/api/persons', (req, res) => {
   person.save().then(personSaved => {
     res.json(personSaved)
   })
-
+  
 })
 
 const PORT = process.env.PORT;
