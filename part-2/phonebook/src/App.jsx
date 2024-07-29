@@ -64,9 +64,9 @@ const App = () => {
             message: `Added ${data.name}`,
             type: 'success'
           })
-        }).catch(() => {
+        }).catch((error) => {
           setNotification({
-            message: `Failed to add person ${newPerson.name}`,
+            message: error.response.data.error,
             type: 'error'
           })
         }).finally(() => {
