@@ -14,39 +14,47 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :d
 app.use(express.static('dist'))
 
 
-app.get("/info", (req, res) => {
+app.get("/info", (req, res, next) => {
   const date = new Date();
   Person.find({}).then((data) => {
     res.send(`
       <p>Phonebook has info for ${data.length} persons</p>
       <p>${date}</p>
     `);
-  });
+  }).catch(next);
 });
 
-app.get("/api/persons", (req, res) => {
+app.get("/api/persons", (req, res, next) => {
   Person.find({}).then((data) => {
     res.json(data);
-  });
+  }).catch(next);
 });
 
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
   const id = req.params.id;
 
   Person.findById(id).then((data) => {
-    res.json(data);
-  });
+    if (data) {
+      res.json(data);
+    } else {
+      res.status(404).send({ error: 'person not found' });
+    }
+  }).catch(next);
 });
 
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
   const id = req.params.id;
 
-  Person.findByIdAndDelete(id).then(() => {
-    res.status(204).end()
-  });
+  Person.findByIdAndDelete(id).then(result => {
+    if (result) {
+      res.status(204).end();
+    } else {
+      res.status(404).send({ error: 'person not found' });
+    }
+  }).catch(next);
 });
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const body = req.body
 
   const person = new Person({
@@ -56,8 +64,20 @@ app.post('/api/persons', (req, res) => {
 
   person.save().then(personSaved => {
     res.json(personSaved)
-  })
+  }).catch(next)
   
+})
+
+app.use((req, res) => {
+	res.status(404).send({ error: 'unknown endpoint' })
+})
+
+app.use((error, req, res, next) => {
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
 })
 
 const PORT = process.env.PORT;
