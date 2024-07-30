@@ -1,26 +1,57 @@
 const { test, describe } = require('node:test')
 const assert = require('node:assert')
-const { dummy, totalLikes, favoriteBlog, mostBlogs } = require('../utils/list_helper')
+const { dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes } = require('../utils/list_helper')
+
+const blogsArrayEmpty = []
+const listWithOneBlog = [
+  {
+    _id: '5a422aa71b54a676234d17f8',
+    title: 'Go To Statement Considered Harmful',
+    author: 'Edsger W. Dijkstra',
+    url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+    likes: 5,
+    __v: 0
+  }
+]
+const blogsArray = [
+  {
+    title: 'title 1',
+    author: 'author a',
+    likes: 7
+  },
+  {
+    title: 'title 2',
+    author: 'author b',
+    likes: 5
+  },
+  {
+    title: 'title 3',
+    author: 'author c',
+    likes: 10
+  },
+  {
+    title: 'title 4',
+    author: 'author d',
+    likes: 0
+  },
+  {
+    title: 'title 5',
+    author: 'author a',
+    likes: 2
+  },
+  {
+    title: 'title 3',
+    author: 'author c',
+    likes: 12
+  }
+]
 
 test('dummy returns one', () => {
-  const blogs = []
-
-  const result = dummy(blogs)
+  const result = dummy(blogsArrayEmpty)
   assert.strictEqual(result, 1)
 })
 
 describe('total likes', () => {
-  const listWithOneBlog = [
-    {
-      _id: '5a422aa71b54a676234d17f8',
-      title: 'Go To Statement Considered Harmful',
-      author: 'Edsger W. Dijkstra',
-      url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
-      likes: 5,
-      __v: 0
-    }
-  ]
-
   test('when list has only one blog, equals the likes of that', () => {
     const result = totalLikes(listWithOneBlog)
     assert.strictEqual(result, 5)
@@ -34,22 +65,13 @@ describe('favoriteBlog', () => {
   })
 
   test('with an empty blog array', () => {
-    const blogs = []
-    const result = favoriteBlog(blogs)
+    const result = favoriteBlog(blogsArrayEmpty)
     assert.deepStrictEqual(result, {})
   })
 
   test('most liked of a array of blogs', () => {
-    const blogs = [
-      { name: 'blog 1', likes: 1 },
-      { name: 'blog 2', likes: 7 },
-      { name: 'blog 3', likes: 10 },
-      { name: 'blog 4', likes: 2 },
-      { name: 'blog 5', likes: 15 }
-    ]
-
-    const result = favoriteBlog(blogs)
-    assert.deepStrictEqual(result, blogs[4])
+    const result = favoriteBlog(blogsArray)
+    assert.deepStrictEqual(result, blogsArray[5])
   })
 })
 
@@ -60,46 +82,37 @@ describe('most blogs', () => {
   })
 
   test('with an empty array', () => {
-    const blogs = []
-
-    const result = mostBlogs(blogs)
+    const result = mostBlogs(blogsArrayEmpty)
     assert.deepStrictEqual(result, {})
   })
 
   test('with a blog array', () => {
-    const blogs = [
-      {
-        title: 'title 1',
-        author: 'author a',
-        likes: 7
-      },
-      {
-        title: 'title 2',
-        author: 'author b',
-        likes: 5
-      },
-      {
-        title: 'title 3',
-        author: 'author c',
-        likes: 10
-      },
-      {
-        title: 'title 4',
-        author: 'author d',
-        likes: 0
-      },
-      {
-        title: 'title 5',
-        author: 'author a',
-        likes: 2
-      }
-    ]
-
-    const result = mostBlogs(blogs)
+    const result = mostBlogs(blogsArray)
 
     assert.deepStrictEqual(result, {
       author: 'author a',
       blogs: 2
+    })
+  })
+})
+
+describe('the author with the most likes', () => {
+  test('without passing blogs', () => {
+    const result = mostLikes()
+    assert.deepStrictEqual(result, {})
+  })
+
+  test('with an empty array', () => {
+    const result = mostLikes(blogsArrayEmpty)
+    assert.deepStrictEqual(result, {})
+  })
+
+  test('with a blog array', () => {
+    const result = mostLikes(blogsArray)
+
+    assert.deepStrictEqual(result, {
+      author: 'author c',
+      likes: 22
     })
   })
 })
