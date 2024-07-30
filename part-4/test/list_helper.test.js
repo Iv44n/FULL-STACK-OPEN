@@ -1,6 +1,6 @@
 const { test, describe } = require('node:test')
 const assert = require('node:assert')
-const { dummy, totalLikes } = require('../utils/list_helper')
+const { dummy, totalLikes, favoriteBlog } = require('../utils/list_helper')
 
 test('dummy returns one', () => {
   const blogs = []
@@ -24,5 +24,31 @@ describe('total likes', () => {
   test('when list has only one blog, equals the likes of that', () => {
     const result = totalLikes(listWithOneBlog)
     assert.strictEqual(result, 5)
+  })
+})
+
+describe('favoriteBlog', () => {
+  test('without passing blogs', () => {
+    const result = favoriteBlog()
+    assert.deepStrictEqual(result, {})
+  })
+
+  test('with an empty blog array', () => {
+    const blogs = []
+    const result = favoriteBlog(blogs)
+    assert.deepStrictEqual(result, {})
+  })
+
+  test('most liked of a array of blogs', () => {
+    const blogs = [
+      { name: 'blog 1', likes: 1 },
+      { name: 'blog 2', likes: 7 },
+      { name: 'blog 3', likes: 10 },
+      { name: 'blog 4', likes: 2 },
+      { name: 'blog 5', likes: 15 }
+    ]
+
+    const result = favoriteBlog(blogs)
+    assert.deepStrictEqual(result, blogs[4])
   })
 })
