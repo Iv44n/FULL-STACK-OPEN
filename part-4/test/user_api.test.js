@@ -1,29 +1,10 @@
 const { test, beforeEach, after } = require('node:test')
 const assert = require('node:assert')
-const bcrypt = require('bcrypt')
-const User = require('../models/user')
 const mongoose = require('mongoose')
-const supertest = require('supertest')
-const app = require('../app')
-
-const api = supertest(app)
-
-const usersInDb = async () => {
-  const users = await User.find({})
-  return users.map(user => user.toJSON())
-}
+const { api, usersInDb, newUser } = require('./test_helper')
 
 beforeEach(async () => {
-  await User.deleteMany({})
-
-  const passwordHash = await bcrypt.hash('rootpassword', 10)
-  const user = new User({
-    username: 'root',
-    name: 'Superuser',
-    passwordHash
-  })
-
-  await user.save()
+  await newUser()
 
   console.log('<<<< Users reloaded >>>>')
 })

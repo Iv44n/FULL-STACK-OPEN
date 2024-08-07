@@ -2,25 +2,34 @@ const { test, after, beforeEach, describe } = require('node:test')
 const assert = require('node:assert')
 const Blog = require('../models/blog')
 const mongoose = require('mongoose')
-const supertest = require('supertest')
-const app = require('../app')
-const { initialBlogs, blogsInDb } = require('./blog_helper')
-
-const api = supertest(app)
+const { api, initialBlogs, blogsInDb, createToken, newUser } = require('./test_helper')
 
 describe('testing of the blog api, when initially there are some saved blogs', () => {
+  let token
   beforeEach(async () => {
     await Blog.deleteMany({})
 
-    const blogObjects = initialBlogs.map(blog => new Blog(blog))
+    const userToSave = await newUser()
+
+    const blogObjects = initialBlogs.map(blog => {
+      blog.user = userToSave._id
+      return new Blog(blog)
+    })
     const promiseArray = blogObjects.map(blog => blog.save())
     await Promise.all(promiseArray)
+
+    const newToken = await createToken()
+    token = newToken
+
     console.log('<<<< Blogs reloaded >>>>')
   })
 
   describe('methods get', () => {
     test('there are three blogs', async () => {
-      const res = await api.get('/api/blogs/').expect(200).expect('Content-Type', /application\/json/)
+      const res = await api
+        .get('/api/blogs/')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
 
       assert.strictEqual(res.body.length, initialBlogs.length)
     })
@@ -34,7 +43,7 @@ describe('testing of the blog api, when initially there are some saved blogs', (
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
-      assert.deepStrictEqual(resultBlog.body, blogToView)
+      assert.deepStrictEqual(resultBlog.body.title, blogToView.title)
     })
 
     test('blog has id property', async () => {
@@ -55,6 +64,7 @@ describe('testing of the blog api, when initially there are some saved blogs', (
       await api
         .post('/api/blogs/')
         .send(newBlog)
+        .set('Authorization', `Bearer ${token}`)
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
@@ -75,6 +85,7 @@ describe('testing of the blog api, when initially there are some saved blogs', (
       await api
         .post('/api/blogs/')
         .send(newBlog)
+        .set('Authorization', `Bearer ${token}`)
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
@@ -92,7 +103,25 @@ describe('testing of the blog api, when initially there are some saved blogs', (
       await api
         .post('/api/blogs/')
         .send(newBlog)
+        .set('Authorization', `Bearer ${token}`)
         .expect(400)
+
+      const blogs = await blogsInDb()
+      assert.strictEqual(blogs.length, initialBlogs.length)
+    })
+
+    test('if token is missing, 401 is returned', async () => {
+      const newBlog = {
+        title: 'Test Blog 4',
+        author: 'Test Author 4',
+        url: 'url test 4',
+        likes: 3
+      }
+
+      await api
+        .post('/api/blogs/')
+        .send(newBlog)
+        .expect(401)
 
       const blogs = await blogsInDb()
       assert.strictEqual(blogs.length, initialBlogs.length)
@@ -106,6 +135,7 @@ describe('testing of the blog api, when initially there are some saved blogs', (
 
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(204)
 
       const blogsAtEnd = await blogsInDb()
