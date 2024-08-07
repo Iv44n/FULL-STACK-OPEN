@@ -5,7 +5,8 @@ require('express-async-errors')
 const {
   requestLogger,
   unknownEndpoint,
-  errorHandler
+  errorHandler,
+  tokenExtractor
 } = require('./utils/middlewares')
 const mongoose = require('mongoose')
 
@@ -27,6 +28,7 @@ mongoose.connect(MONGODB_URI)
 app.use(cors())
 app.use(express.json())
 app.use(requestLogger)
+app.use(tokenExtractor)
 
 app.use('/api/blogs', notesRouter)
 app.use('/api/users', usersRouter)
