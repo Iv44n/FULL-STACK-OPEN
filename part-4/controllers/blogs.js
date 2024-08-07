@@ -1,7 +1,5 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user')
-const jwt = require('jsonwebtoken')
 
 blogsRouter.get('/', async (req, res) => {
   const blogs = await Blog
@@ -31,18 +29,15 @@ blogsRouter.get('/:id', async (req, res) => {
 
 blogsRouter.post('/', async (req, res) => {
   const { title, author, url, likes = 0 } = req.body
+  const user = req.user
 
   if (!title || !url || !author) {
     return res.status(400).json({ error: 'Bad request' })
   }
 
-  const decodedToken = jwt.verify(req.token, process.env.SECRET)
-
-  if (!decodedToken.id) {
+  if (!user) {
     return res.status(401).json({ error: 'token invalid' })
   }
-
-  const user = await User.findById(decodedToken.id)
 
   const blog = new Blog({
     title,
@@ -61,24 +56,16 @@ blogsRouter.post('/', async (req, res) => {
 
 blogsRouter.delete('/:id', async (req, res) => {
   const blogId = req.params.id
+  const user = req.user
 
-  const decodedToken = jwt.verify(req.token, process.env.SECRET)
-
-  if (!decodedToken.id) {
+  if (!user) {
     return res.status(401).json({ error: 'token invalid' })
   }
 
-  const [user, blog] = await Promise.all([
-    User.findById(decodedToken.id),
-    Blog.findById(blogId)
-  ])
-
-  if (!user) {
-    return res.status(404).json({ error: 'token missing or invalid' })
-  }
+  const blog = await Blog.findById(blogId)
 
   if (!blog) {
-    return res.status(404).json({ error: 'blog or user not found' })
+    return res.status(404).json({ error: 'blog not found' })
   }
 
   if (user._id.toString() === blog.user.toString()) {
