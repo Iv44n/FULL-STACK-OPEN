@@ -5,9 +5,9 @@ blogsRouter.get('/', async (req, res) => {
   const blogs = await Blog
     .find({})
     .populate('user', {
-      username: 1,
+    username: 1,
       name: 1
-    })
+  })
 
   res.json(blogs)
 })
@@ -16,9 +16,9 @@ blogsRouter.get('/:id', async (req, res) => {
   const blog = await Blog
     .findById(req.params.id)
     .populate('user', {
-      username: 1,
+    username: 1,
       name: 1
-    })
+  })
 
   if (blog) {
     res.json(blog)
@@ -48,10 +48,16 @@ blogsRouter.post('/', async (req, res) => {
   })
 
   const savedBlog = await blog.save()
+  const populateBlog = await savedBlog.populate('user', {
+      username: 1,
+      name: 1
+  })
+
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
 
-  res.status(201).json(savedBlog)
+
+  res.status(201).json(populateBlog)
 })
 
 blogsRouter.delete('/:id', async (req, res) => {
@@ -77,10 +83,27 @@ blogsRouter.delete('/:id', async (req, res) => {
 })
 
 blogsRouter.put('/:id', async (req, res) => {
-  const id = req.params.id
-  const blog = req.body
+  const blogId = req.params.id
+  const newBlog = req.body
+  const user = req.user
 
-  const updatedBlog = await Blog.findByIdAndUpdate(id, blog, { new: true })
+  if (!user) {
+    return res.status(401).json({ error: 'token invalid' })
+  }
+
+  const blog = await Blog.findById(blogId)
+
+  if (!blog) {
+    return res.status(404).json({ error: 'blog not found' })
+  }
+
+  const updatedBlog = await Blog.findByIdAndUpdate(blogId, newBlog, {
+    new: true,
+  }).populate('user', {
+    username: 1,
+    name: 1
+  })
+
   res.json(updatedBlog)
 })
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
-import { getAllBlogs, setToken, addBlog } from './services/blogs'
+import { getAllBlogs, setToken, addBlog, updateBlog } from './services/blogs'
 import { signIn } from './services/login'
 import Noti from './components/Noti'
 import Togglable from './components/Togglable'
@@ -69,6 +69,20 @@ const App = () => {
     }
   }
 
+  const editBlog = async (id, newBlog) => {
+    try {
+      const res = await updateBlog(id, newBlog)
+      setBlogs(
+        blogs.map((prevBlog) => (prevBlog.id === res.id ? res : prevBlog))
+      )
+    } catch (error) {
+      setErrorMessage(error.response.data.error)
+      setTimeout(() => {
+        setErrorMessage('')
+      }, 2000)
+    }
+  }
+
   return (
     <main>
       {user ? (
@@ -87,7 +101,7 @@ const App = () => {
           </div>
           <br />
           {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} />
+            <Blog key={blog.id} blog={blog} editBlogFunc={editBlog} />
           ))}
         </section>
       ) : (

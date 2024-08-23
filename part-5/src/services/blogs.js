@@ -22,3 +22,14 @@ export const addBlog = async (newBlog) => {
   const res = await axios.post(BASE_URL, newBlog, config)
   return res.data
 }
+
+export const updateBlog = async (id, newBlog) => {
+  const config = {
+    headers: {
+      Authorization: token,
+    },
+  }
+
+  const res = await axios.put(`${BASE_URL}/${id}`, newBlog, config)
+  return res.data
+}
