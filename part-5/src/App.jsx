@@ -4,15 +4,12 @@ import { getAllBlogs, setToken, addBlog } from './services/blogs'
 import { signIn } from './services/login'
 import Noti from './components/Noti'
 import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
+import LoginForm from './components/LoginForm'
 
 const App = () => {
   const [user, setUser] = useState(null)
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
@@ -33,13 +30,9 @@ const App = () => {
 
   const blogFormRef = useRef()
 
-  const handleLogin = async (e) => {
-    e.preventDefault()
+  const handleLogin = async (userLoginObject) => {
     try {
-      const user = await signIn({
-        username,
-        password,
-      })
+      const user = await signIn(userLoginObject)
 
       window.localStorage.setItem('loggedUser', JSON.stringify(user))
       setUser(user)
@@ -51,25 +44,18 @@ const App = () => {
     }
   }
 
-  const handleLogout = (e) => {
-    e.preventDefault()
+  const handleLogout = () => {
     window.localStorage.removeItem('loggedUser')
     setUser(null)
   }
 
-  const createNewBlog = async (e) => {
-    e.preventDefault()
-    
+  const createNewBlog = async (blogObject) => {
     blogFormRef.current.toggleVisibility()
 
     try {
-      const res = await addBlog({
-        title,
-        author,
-        url,
-      })
+      const res = await addBlog(blogObject)
 
-      setBlogs(prevBlog => [...prevBlog, res])
+      setBlogs((prevBlog) => [...prevBlog, res])
 
       setSuccessMessage(`A new blog ${res.title} by ${res.author}`)
       setTimeout(() => {
@@ -81,10 +67,6 @@ const App = () => {
         setErrorMessage('')
       }, 2000)
     }
-
-    setTitle('')
-    setAuthor('')
-    setUrl('')
   }
 
   return (
@@ -100,33 +82,7 @@ const App = () => {
           <div>
             <Togglable buttonLabel='New Note' ref={blogFormRef}>
               <h2>Create new</h2>
-              <form onSubmit={createNewBlog}>
-                <div>
-                  title:
-                  <input
-                    type='text'
-                    value={title}
-                    onChange={({ target }) => setTitle(target.value)}
-                  />
-                </div>
-                <div>
-                  author:
-                  <input
-                    type='text'
-                    value={author}
-                    onChange={({ target }) => setAuthor(target.value)}
-                  />
-                </div>
-                <div>
-                  url:
-                  <input
-                    type='text'
-                    value={url}
-                    onChange={({ target }) => setUrl(target.value)}
-                  />
-                </div>
-                <button type='submit'>Create</button>
-              </form>
+              <BlogForm createNewBlog={createNewBlog} />
             </Togglable>
           </div>
           <br />
@@ -138,25 +94,7 @@ const App = () => {
         <section>
           <h2>log in to application</h2>
           <Noti errorMessage={errorMessage} successMessage={successMessage} />
-          <form onSubmit={handleLogin}>
-            <div>
-              username:
-              <input
-                type='text'
-                value={username}
-                onChange={({ target }) => setUsername(target.value)}
-              />
-            </div>
-            <div>
-              password:
-              <input
-                type='password'
-                value={password}
-                onChange={({ target }) => setPassword(target.value)}
-              />
-            </div>
-            <button type='submit'>login</button>
-          </form>
+          <LoginForm signIn={handleLogin} />
         </section>
       )}
     </main>
