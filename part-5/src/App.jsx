@@ -83,6 +83,8 @@ const App = () => {
     }
   }
 
+  const sortedBlogsByLikes = blogs.sort((blogA, blogB) => blogB.likes - blogA.likes)
+
   return (
     <main>
       {user ? (
@@ -90,7 +92,7 @@ const App = () => {
           <h2>blogs</h2>
           <Noti errorMessage={errorMessage} successMessage={successMessage} />
           <p>
-            {user.name} logged in
+            {sortedBlogsByLikes.name} logged in
             <button onClick={handleLogout}>logout</button>
           </p>
           <div>
