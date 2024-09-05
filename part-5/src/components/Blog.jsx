@@ -1,7 +1,8 @@
 import { useState } from 'react'
 
-const Blog = ({ blog, editBlogFunc }) => {
+const Blog = ({ blog, editBlogFunc, deleteBlogFunc, userName }) => {
   const [showDetails, setShowDetails] = useState(false)
+  const { id, user, ...restBlog } = blog
 
   const blogStyle = {
     border: '1px solid #ddd',
@@ -12,8 +13,6 @@ const Blog = ({ blog, editBlogFunc }) => {
   }
 
   const handleLike = () => {
-    const { id, user, ...restBlog } = blog
-
     const newLikes = blog.likes + 1
     const newBlog = {
       ...restBlog,
@@ -22,6 +21,8 @@ const Blog = ({ blog, editBlogFunc }) => {
 
     editBlogFunc(id, newBlog)
   }
+
+  const isDeleteBlog = user.username === userName
 
   return (
     <div style={blogStyle}>
@@ -37,6 +38,7 @@ const Blog = ({ blog, editBlogFunc }) => {
           likes: {blog.likes} <button onClick={handleLike}>like</button>
         </p>
         <p>{blog.user.name}</p>
+        {isDeleteBlog && <button onClick={() => deleteBlogFunc(blog)}>Delete</button>}
       </div>
     </div>
   )

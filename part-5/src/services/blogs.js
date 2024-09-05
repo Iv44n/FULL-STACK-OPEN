@@ -33,3 +33,14 @@ export const updateBlog = async (id, newBlog) => {
   const res = await axios.put(`${BASE_URL}/${id}`, newBlog, config)
   return res.data
 }
+
+export const deleteBlogById = async (id) => {
+  const config = {
+    headers: {
+      Authorization: token,
+    },
+  }
+
+  const res = await axios.delete(`${BASE_URL}/${id}`, config)
+  return res.status
+}

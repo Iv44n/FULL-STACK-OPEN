@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
-import { getAllBlogs, setToken, addBlog, updateBlog } from './services/blogs'
+import { getAllBlogs, setToken, addBlog, updateBlog, deleteBlogById } from './services/blogs'
 import { signIn } from './services/login'
 import Noti from './components/Noti'
 import Togglable from './components/Togglable'
@@ -83,6 +83,23 @@ const App = () => {
     }
   }
 
+  const deleteBlog = async (blogForDelete) => {
+    const windowMessage = `Remove blog ${blogForDelete.title} by ${blogForDelete.author}`
+    if(!window.confirm(windowMessage)) return
+
+    try {
+      const status = await deleteBlogById(blogForDelete.id)
+      if(status === 204) {
+        setBlogs(blogs.filter(blog => blog.id !== blogForDelete.id))
+      }
+    } catch (error) {
+      setErrorMessage(error.response.data.error)
+      setTimeout(() => {
+        setErrorMessage('')
+      }, 2000)
+    }
+  }
+
   const sortedBlogsByLikes = blogs.sort((blogA, blogB) => blogB.likes - blogA.likes)
 
   return (
@@ -103,7 +120,13 @@ const App = () => {
           </div>
           <br />
           {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} editBlogFunc={editBlog} />
+            <Blog 
+              key={blog.id} 
+              blog={blog} 
+              editBlogFunc={editBlog} 
+              deleteBlogFunc={deleteBlog} 
+              userName={user.username}
+            />
           ))}
         </section>
       ) : (
