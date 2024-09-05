@@ -1,10 +1,12 @@
+import PropTypes from 'prop-types'
+
 const generateClass = (options) => {
   return {
     width: 'fit-content',
     paddingBlock: 5,
     paddingInline: 10,
     borderRadius: 5,
-    ...options,
+    ...options
   }
 }
 
@@ -15,7 +17,7 @@ const Noti = ({ errorMessage, successMessage }) => {
         <div
           style={generateClass({
             color: 'red',
-            border: '1px solid red',
+            border: '1px solid red'
           })}
         >
           {errorMessage}
@@ -31,7 +33,7 @@ const Noti = ({ errorMessage, successMessage }) => {
         <div
           style={generateClass({
             color: 'green',
-            border: '1px solid green',
+            border: '1px solid green'
           })}
         >
           {successMessage}
@@ -42,6 +44,11 @@ const Noti = ({ errorMessage, successMessage }) => {
   }
 
   return null
+}
+
+Noti.propTypes = {
+  errorMessage: PropTypes.string,
+  successMessage: PropTypes.string
 }
 
 export default Noti

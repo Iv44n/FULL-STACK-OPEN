@@ -26,8 +26,8 @@ export const addBlog = async (newBlog) => {
 export const updateBlog = async (id, newBlog) => {
   const config = {
     headers: {
-      Authorization: token,
-    },
+      Authorization: token
+    }
   }
 
   const res = await axios.put(`${BASE_URL}/${id}`, newBlog, config)
@@ -37,8 +37,8 @@ export const updateBlog = async (id, newBlog) => {
 export const deleteBlogById = async (id) => {
   const config = {
     headers: {
-      Authorization: token,
-    },
+      Authorization: token
+    }
   }
 
   const res = await axios.delete(`${BASE_URL}/${id}`, config)

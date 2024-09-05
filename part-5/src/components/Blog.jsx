@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import PropTypes from 'prop-types'
 
 const Blog = ({ blog, editBlogFunc, deleteBlogFunc, userName }) => {
   const [showDetails, setShowDetails] = useState(false)
@@ -9,14 +10,14 @@ const Blog = ({ blog, editBlogFunc, deleteBlogFunc, userName }) => {
     borderRadius: '5px',
     padding: '5px 20px',
     margin: '10px 0',
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#f9f9f9'
   }
 
   const handleLike = () => {
     const newLikes = blog.likes + 1
     const newBlog = {
       ...restBlog,
-      likes: newLikes,
+      likes: newLikes
     }
 
     editBlogFunc(id, newBlog)
@@ -42,6 +43,13 @@ const Blog = ({ blog, editBlogFunc, deleteBlogFunc, userName }) => {
       </div>
     </div>
   )
+}
+
+Blog.propTypes = {
+  blog: PropTypes.object,
+  editBlogFunc: PropTypes.func,
+  deleteBlogFunc: PropTypes.func,
+  userName: PropTypes.string
 }
 
 export default Blog

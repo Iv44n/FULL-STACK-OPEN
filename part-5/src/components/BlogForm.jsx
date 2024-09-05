@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import PropTypes from 'prop-types'
 
 const BlogForm = ({ createNewBlog }) => {
   const [title, setTitle] = useState('')
@@ -11,7 +12,7 @@ const BlogForm = ({ createNewBlog }) => {
     createNewBlog({
       title,
       author,
-      url,
+      url
     })
   }
 
@@ -44,6 +45,10 @@ const BlogForm = ({ createNewBlog }) => {
       <button type='submit'>Create</button>
     </form>
   )
+}
+
+BlogForm.propTypes = {
+  createNewBlog: PropTypes.func
 }
 
 export default BlogForm
